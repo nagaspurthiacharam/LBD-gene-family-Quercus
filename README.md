@@ -19,33 +19,41 @@ Final analytical catalogue: **42 QrLBD primary loci + 37 QsLBD primary loci = 79
 
 ```
 LBD-gene-family-Quercus/
-|
-|-- README.md
-|-- 01_hmmer_identification.sh         HMMER + BLASTP + NCBI CDD gene identification
-|-- 02_gene_expression/
-|   |-- README.md                      Pipeline overview (paired-end)
-|   |-- PE_paired_end/                 SRA download, QC, mapping pipeline
-|   |   |-- 0_downloadSRA_PE.sh
-|   |   |-- 1_QualityCheck_PE.sh
-|   |   |-- 2_Trimmomatic_PE.sh
-|   |   |-- 3_hisat2_mapping_PE.sh
-|   |-- extract_QrLBD_counts.R         Pull 42-gene counts from full matrix
-|   |-- Heatmap_zscore_QrLBD.R         z-score heatmap, Q. rubra (PRJNA273270)
-|   |-- Heatmap_zscore_QsLBD.R         z-score heatmap, Q. suber (PRJNA392919)
-|-- 03_collinearity/
-|   |-- collinearity_workflow.sh       BLASTP + MCScanX pipeline
-|   |-- plot_synteny_all.py            Unified four-comparison synteny plotter
-|-- 04_cis_promoter/
-|   |-- Cis_tile_heatmap.R             Tile heatmap of cis-elements (main + supp)
-|   |-- Cis_curated_QrLBD42.xlsx       Curated per-element counts, Q. rubra
-|   |-- Cis_curated_QsLBD37.xlsx       Curated per-element counts, Q. suber
-|-- data/
-    |-- LBD_highlight_QrQs.txt         79 LBD gene IDs (42 Qr + 37 Qs primary)
-    |-- QrLBD_master.csv               Canonical 42-gene catalogue + 5 sub-isoforms
-    |-- QrLBD_phylo_order.txt          Mid-point-rooted Qr leaf order, 42 entries
-    |-- QsLBD_phylo_order.txt          Mid-point-rooted Qs leaf order, 37 entries
-    |-- QrLBD_42_proteins.fasta        Q. rubra LBD proteome
-    |-- QsLBD_37_proteins.fasta        Q. suber LBD proteome
+│
+├── README.md
+├── LICENSE
+├── 01_hmmer_identification.sh
+│
+├── 02_gene_expression/
+│   ├── README.md
+│   ├── DEG_analysis.R
+│   ├── extract_QrLBD_counts.R
+│   ├── Heatmap_zscore_QrLBD.R
+│   ├── Heatmap_zscore_QsLBD.R
+│   └── PE_paired_end/
+│       ├── 0_downloadSRA_PE.sh
+│       ├── 1_QualityCheck_PE.sh
+│       ├── 2_Trimmomatic_PE.sh
+│       └── 3_hisat2_mapping_PE.sh
+│
+├── 03_collinearity/
+│   ├── collinearity_workflow.sh
+│   └── plot_synteny_all.py
+│
+├── 04_cis_promoter/
+│   ├── Cis_tile_heatmap.R
+│   ├── Cis_curated_QrLBD42.xlsx
+│   └── Cis_curated_QsLBD37.xlsx
+│
+└── data/
+    ├── LBD_gene_IDs.txt
+    ├── QrLBD_gene_catalogue.csv          
+    ├── QrLBD_phylogeny_order.txt
+    ├── QsLBD_phylogeny_order.txt
+    ├── QrLBD_proteins.fasta              (42 sequences)
+    ├── QsLBD_proteins.fasta              (37 sequences)
+    ├── QrLBD_promoters_2kb.fasta
+    └── QsLBD_promoters_2kb.fasta
 ```
 
 ## Analysis Pipeline
@@ -89,4 +97,67 @@ Genome-wide synteny detection across four species comparisons via MCScanX. The u
 
 ## 4. Cis-Regulatory Elements (`04_cis_promoter/`)
 
-PlantCARE prediction across the 2-kb upstream region of every LBD locus, curated to 22 informative motifs grouped under five functional categories (hormone-, stress-, light/circadian-, promoter-core-, transcription-factor-binding-related). The R scr
+PlantCARE prediction across the 2-kb upstream region of every LBD locus, curated to 22 informative motifs grouped under five functional categories (hormone-, stress-, light/circadian-, promoter-core-, transcription-factor-binding-related). The R script `Cis_tile_heatmap.R` produces:
+
+- **Main figure** (`Cis_main_summary.png`): five-category totals for both species side-by-side with a shared colour scale for direct interspecific comparison.
+- **Supplementary figures** (`Cis_QrLBD_tile.png`, `Cis_QsLBD_tile.png`): per-element detailed matrices, one per species.
+
+Tile-heatmap convention (raw counts + heat-colour fill) follows the *Brassica napus* PSK family analysis (Zhang et al., 2026) and the LBD genome-wide surveys in poplar, bamboo, and grapevine.
+
+## Genome Resources
+
+| Species | Accession | Source |
+|---|---|---|
+| *Quercus rubra* v2.1 | — | Phytozome v13 |
+| *Quercus suber* | GCF_002906115.3 | NCBI RefSeq |
+| *Populus trichocarpa* v4.1 | GCF_000002775.5 | NCBI RefSeq |
+| *Arabidopsis thaliana* TAIR10.1 | GCA_000001735.2 | NCBI GenBank |
+| *Oryza sativa* indica 93-11 | GCA_000004655.2 | NCBI GenBank |
+| *Populus alba* | — | Phytozome v13 |
+
+## Software & Citations
+
+| Tool | Version | Citation |
+|---|---|---|
+| HMMER | 3.3.2 | Eddy (2011) PLoS Comput Biol 7:e1002195 |
+| NCBI BLAST+ | 2.12 | Camacho et al. (2009) BMC Bioinformatics 10:421 |
+| NCBI CDD / CD-Search | — | Marchler-Bauer et al. (2017) Nucleic Acids Res 45:D200 |
+| HISAT2 | 2.2.1 | Kim et al. (2019) Nat Biotechnol 37:907 |
+| StringTie | 2.2.1 | Pertea et al. (2015) Nat Biotechnol 33:290 |
+| Trimmomatic | 0.39 | Bolger et al. (2014) Bioinformatics 30:2114 |
+| FastQC | 0.12 | Andrews (2010) Babraham Bioinformatics |
+| pheatmap | 1.0.12 | Kolde (2019) CRAN |
+| ggplot2 | 3.4 | Wickham (2016) Springer |
+| patchwork | 1.1 | Pedersen (2024) CRAN |
+| MCScanX | — | Wang et al. (2012) Nucleic Acids Res 40:e49 |
+| matplotlib | 3.7 | Hunter (2007) Comput Sci Eng 9:90 |
+| MEGA 7 | 7.0 | Kumar et al. (2016) Mol Biol Evol 33:1870 |
+| MEME Suite | 5.5 | Bailey et al. (2015) Nucleic Acids Res 43:W39 |
+| TBtools-II | 2.0 | Chen et al. (2023) Mol Plant 16:1733 |
+| iTOL | 7 | Letunic & Bork (2024) Nucleic Acids Res 52:W78 |
+| Blast2GO | 6.0 | Conesa et al. (2005) Bioinformatics 21:3674 |
+| STRING | 11.5 | Szklarczyk et al. (2021) Nucleic Acids Res 49:D605 |
+| PlantCARE | — | Lescot et al. (2002) Nucleic Acids Res 30:325 |
+| MG2C | v2.1 | Chao et al. (2015, 2021) |
+
+## Requirements
+
+```bash
+sudo apt-get install ncbi-blast+ hisat2 stringtie trimmomatic fastqc samtools
+conda install -c bioconda hmmer
+git clone https://github.com/wyp1125/MCScanX.git && cd MCScanX && make
+Rscript -e 'install.packages(c("pheatmap","RColorBrewer","ggplot2","readxl","dplyr","tidyr","scales","patchwork"))'
+pip install matplotlib pandas openpyxl
+```
+
+## Setup
+
+Replace `<YOUR_HPC_ID>` in shell scripts with your HPC username before running.
+
+## Acknowledgments
+
+The RNA-seq analysis scripts in `02_gene_expression/` were adapted from the Functional Genomics course (BIOL7180) pipeline originally developed by **Dr. Rita Graze**, Auburn University.
+
+## License
+
+MIT License. Please cite the tools listed above when using this pipeline in publications.
